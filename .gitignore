@@ -1,0 +1,8 @@
+@"
+**/bin/
+**/obj/
+.vs/
+*.user
+*.suo
+"@ | Out-File -Encoding utf8 .gitignore
+Output/
