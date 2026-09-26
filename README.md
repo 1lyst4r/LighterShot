@@ -6,9 +6,9 @@ A small, fast Windows screenshot tool.
 # LICENSE
 Copyright (c) 2026 REI
 All rights reserved.
-The source code of LightlyShot is made publicly available for educational, review, and demonstration purposes.
+The source code of Snappo is made publicly available for educational, review, and demonstration purposes.
 Permission is granted to view, inspect, and download the source code for personal, non-commercial evaluation and educational purposes.
-Official, unmodified releases of LightlyShot may be downloaded and used for personal, non-commercial purposes.
+Official, unmodified releases of Snappo may be downloaded and used for personal, non-commercial purposes.
 
 ### Restrictions
 
