@@ -1,36 +1,77 @@
 # Snappo
 
-A fast, lightweight screenshot and annotation tool for **Windows**.
+A small, fast Windows screenshot tool.
+**Hotkey -> screen dims -> drag to select -> annotate -> Ctrl+C or Ctrl+S.**
 
-## Download
+## Build and run
 
-Download the latest installer from the **Releases** page.
+Needs the .NET 8 SDK on Windows 10/11.
 
-## Requirements
+    dotnet run -c Release
 
-Windows x64
+Fast-starting build (pre-compiled, output in `bin/Release/net8.0-windows/win-x64/publish/`):
 
-## License
+    dotnet publish -c Release
 
-Copyright (c) 2026 REI
-All rights reserved.
-The source code of Snappo is made publicly available for educational, review, and demonstration purposes.
-Permission is granted to view, inspect, and download the source code for personal, non-commercial evaluation and educational purposes.
-Official, unmodified releases of Snappo may be downloaded and used for personal, non-commercial purposes.
+Default capture key is PrintScreen. Change it from the tray icon -> Settings.
+(If Windows 11's Snipping Tool still opens on PrintScreen, turn off
+Settings > Accessibility > Keyboard > "Use the Print screen button to open screen capture".)
 
-### Restrictions
+## Shortcuts while capturing
 
-Without prior written permission from the copyright holder, you may not:
+| Key | Action |
+|---|---|
+| Ctrl+C | copy the screenshot to the clipboard |
+| Ctrl+S | save as PNG (no dialog) to the save folder |
+| Ctrl+A | select the whole monitor |
+| Ctrl+Z / Ctrl+Y | undo / redo |
+| Esc or right-click | cancel (while typing text, Esc cancels only the text) |
+| Shift (while dragging) | arrows snap to 45 degrees, rectangles become squares, circles stay round |
+| Space (while dragging the selection) | move the selection instead of resizing it |
+| Enter / Shift+Enter | finish text / new line in text |
 
-1. Copy, modify, adapt, merge, or create derivative works of the source code.
-2. Publish, redistribute, sublicense, or sell the source code or modified versions of the software.
-3. Incorporate the software or any portion of its source code into another software product or service.
-4. Use the software or its source code in a commercial product, commercial service, or production environment.
-5. Remove or alter copyright, attribution, or license notices.
-6. Use the source code or software to train, fine-tune, or otherwise develop machine-learning or artificial-intelligence models.
+Click outside the selection to start a new one. The tool and colors you used last are remembered for the next screenshot.
 
-Any permission not expressly granted by this license is reserved by the copyright holder.
+## Settings (tray icon -> Settings)
 
-### Disclaimer
+| Tab | Options |
+|---|---|
+| General | notifications about saving, keep the selected area position, capture the cursor, start with Windows, save folder |
+| Hotkeys | the general hotkey: click the box and press ANY key (or a mouse side button) |
+| Format | PNG or JPEG, and the JPEG quality |
 
-**THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.**
+Notes:
+- "Keep the selected area position" reopens the previous selection on the same monitor. It is remembered until you quit the app.
+- The format applies to saved files (Ctrl+S). Ctrl+C always copies the full-quality image.
+- Any key can be the hotkey, including plain letters. While Snappo runs, that key triggers a screenshot instead of typing, so the window shows a heads-up for everyday keys. While the overlay is open, hotkeys are switched off so every key works normally there.
+
+## Where things live
+
+| Folder | Job |
+|---|---|
+| `Capture/` | grabs each monitor (GDI BitBlt) |
+| `Overlay/` | overlay window, dimming + selection drawing, toolbar, capture session |
+| `Editor/` | annotation types, undo/redo history, drawing layers, pixelate |
+| `Output/` | final image render, clipboard, saving |
+| `Hotkeys/` | global keyboard + mouse-button hotkeys |
+| `Settings/` | settings model, JSON storage, settings window |
+| `Tray/` | tray icon and notifications |
+| `Interop/` | all Win32 declarations |
+
+## Easy things to change
+
+- Look and feel numbers (dim strength, corner radius, line thickness, text size, blur strength, palette): `Editor/EditorDefaults.cs`
+- Toolbar colors and button styles: `App.xaml`
+- Toolbar tool list and icons: table at the top of `Overlay/AnnotationToolbar.cs`
+- New annotation tool: add a class in `Editor/Annotations/`, add it to `OverlayWindow.CreateDragAnnotation` and the toolbar table
+- New hotkey action: add to `Hotkeys/HotkeyAction.cs`, give it a default in `AppSettings.DefaultTriggerFor`, handle it in `App.OnHotkeyTriggered`
+- Settings file: `%APPDATA%\Snappo\settings.json`
+
+## Known limits (honest list)
+
+- A selection stays on one monitor (each monitor has its own overlay so mixed-DPI setups stay pixel-accurate).
+- No resize/move handles on the selection after you release it. Click outside to redo it.
+- Blur is a mosaic/pixelate (it can't be reversed like a soft blur can).
+- Text is typed at the end only (no cursor movement or paste yet).
+- Exclusive-fullscreen games may capture black; borderless windowed works.
+- Saves PNG or JPEG only.
